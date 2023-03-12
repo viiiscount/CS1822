@@ -9,7 +9,7 @@ from Physics_Files.Vector import Vector
 WIDTH = 1280
 HEIGHT = 720
 
-IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822-Project/main/Textures/Tonk.png')
+IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/Tonk.png')
 IMG_CENTRE = (50, 50)
 IMG_DIMS = (100, 100)
 
