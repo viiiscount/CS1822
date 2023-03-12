@@ -20,7 +20,8 @@ tonk = Tonk(Vector(WIDTH/2, HEIGHT/2))
 inter = Interaction(tonk, kbd, mouse)
 
 def draw(canvas):
-    inter.update()
+    inter.updateRockets(canvas)
+    inter.updateTonk()
     tonk.update()
     tonk.draw(canvas)
 
