@@ -34,8 +34,8 @@ class Interaction:
             relX = mousePos[0] - self.tonk.pos.get_p()[0]
             relY = mousePos[1] - self.tonk.pos.get_p()[1]
             self.tonk.img_rot = math.atan2(relY, relX)
-            rocketPos = self.tonk.pos.copy()
-            rocketVel = Vector(relX, relY).normalize().multiply(5)
+            rocketPos = self.tonk.pos.copy().add(Vector(relX, relY).normalize().multiply(40))
+            rocketVel = Vector(relX, relY).normalize().multiply(10)
             self.rocketList.append(Rocket(rocketPos, rocketVel))
         
         for rocket in self.rocketList:
