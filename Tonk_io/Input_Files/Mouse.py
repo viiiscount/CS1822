@@ -5,13 +5,17 @@ except ImportError :
 
 # The Mouse Class
 class Mouse:
+    
+    # Initialiser
     def __init__(self, position=None):
         self.pos = position
 
+    # Gets mouse position when mouse clicked
     def mouse_handler(self, position):
         self.pos = position
     
-    def mouse_moved(self):
+    # Returns mouse position annd sets position to None
+    def mousePos(self):
         temp = self.pos
         self.pos = None
         return temp

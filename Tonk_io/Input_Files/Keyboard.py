@@ -5,12 +5,15 @@ except ImportError :
  
 # The Keyboard Class   
 class Keyboard:
+    
+    # Initialiser
     def __init__(self):
         self.up = False
         self.left = False
         self.down = False
         self.right = False
         
+    # Handles key down presses
     def keyDown(self, key):
         if key == simplegui.KEY_MAP['w']:
             self.up = True
@@ -21,6 +24,7 @@ class Keyboard:
         if key == simplegui.KEY_MAP['d']:
             self.right = True
 
+    # Handles key up presses
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['w']:
             self.up = False
