@@ -12,8 +12,8 @@ class Keyboard:
         self.left = False
         self.down = False
         self.right = False
-        self.fire = False
-        self.pause = False
+        self.space = False
+        self.p = False
 
     # Handles key down
     def keyDown(self, key):
@@ -26,9 +26,9 @@ class Keyboard:
         if key == simplegui.KEY_MAP['d']:
             self.right = True
         if key == simplegui.KEY_MAP['space']:
-            self.fire = True
+            self.space = True
         if key == simplegui.KEY_MAP['p']:
-            self.pause = True
+            self.p = True
 
     # Handles key up
     def keyUp(self, key):
@@ -41,6 +41,6 @@ class Keyboard:
         if key == simplegui.KEY_MAP['d']:
             self.right = False
         if key == simplegui.KEY_MAP['space']:
-            self.fire = False
+            self.space = False
         if key == simplegui.KEY_MAP['p']:
-            self.pause = False
+            self.p = False

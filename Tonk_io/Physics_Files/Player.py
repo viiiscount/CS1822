@@ -6,7 +6,7 @@ except ImportError :
 from .Vector import Vector
 
 # Constants are written in capital letters
-IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/Tonk.png')
+IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/tank.png')
 
 # The Player class
 class Player:
@@ -17,14 +17,14 @@ class Player:
         self.height = height
         self.pos = Vector(width/2, height/2)
         self.vel = Vector()
-        self.img_dest_dim = (100,100)
+        self.img_dest_dim = (128,128)
         self.img_rot = 0
         self.speed_multiplier = 0.75
         self.radius = 35
 
     # Draws the player
     def draw(self, canvas):
-        canvas.draw_image(IMG, (50, 50), (100, 100), self.pos.get_p(), self.img_dest_dim, self.img_rot)
+        canvas.draw_image(IMG, (64, 64), (128, 128), self.pos.get_p(), self.img_dest_dim, self.img_rot)
     
     # Updates the players position using its velocity, and prevents the player from going outside of the arena    
     def update(self):

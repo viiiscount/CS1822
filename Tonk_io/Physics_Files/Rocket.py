@@ -1,8 +1,3 @@
-try:
-    import simplegui
-except ImportError :
-    import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-
 # The Rocket Class
 class Rocket:
     
@@ -10,7 +5,7 @@ class Rocket:
     def __init__(self, pos, vel):
         self.pos = pos
         self.vel = vel
-        self.radius = 8
+        self.radius = 6
 
     # Draws the rocket object
     def drawRocket(self, canvas):

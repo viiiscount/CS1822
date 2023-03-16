@@ -2,7 +2,7 @@ try:
     import simplegui
 except ImportError :
     import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-
+    
 import math
 import random
 from Physics_Files.Vector import Vector
@@ -10,6 +10,11 @@ from Physics_Files.Player import Player
 from Physics_Files.Enemy import Enemy
 from Physics_Files.Rocket import Rocket
 from Physics_Files.Interaction import Interaction
+
+# Constants are written in capital letters
+IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/score.png')
+IMG2 = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/health.png')
+
 
 # The Game Wrapper class
 class Game:
@@ -25,7 +30,7 @@ class Game:
         self.rocketList = []
         self.enemyList = []
         self.score = 0
-        self.lives = 3
+        self.lives = 0
         
     # Runs the game loop
     def gameLoop(self, canvas):
@@ -34,8 +39,11 @@ class Game:
         self.updatePlayer(canvas)
         self.rocketList, self.enemyList, self.score = self.interaction.rocketCollision(self.rocketList, self.enemyList, self.score)
         self.enemyList, self.player, self.lives = self.interaction.playerCollision(self.enemyList, self.player, self.lives)
-        canvas.draw_text("Lives: " + str(self.lives), (10, 25), 25, 'Black', 'monospace')
-        canvas.draw_text("Score: " + str(self.score), (150, 25), 25, 'Black', 'monospace')
+        canvas.draw_image(IMG, (64, 64), (128, 128), (40,40), (64, 64))
+        canvas.draw_image(IMG2, (64, 64), (128, 128), (40,110), (64, 64))
+        canvas.draw_text(str(self.score), (85, 50), 40, 'Black', 'sans-serif')
+        canvas.draw_text(str(self.lives), (85, 120), 40, 'Black', 'sans-serif')
+
     
     # Resets the game   
     def reset(self):
@@ -95,12 +103,11 @@ class Game:
         
         return doNotRemove
         
-        
     # Creates enemies
     def timer_handler(self):
         enemyPos = self.randPos()
-        enemyVel = self.vel(enemyPos)
-        enemy = Enemy(enemyPos, enemyVel)
+        enemyVel, enemyRot = self.vel(enemyPos)
+        enemy = Enemy(enemyPos, enemyVel, enemyRot)
         self.enemyList.append(enemy)
     
     # Gets a random position for the enemy to spawn
@@ -120,4 +127,4 @@ class Game:
     def vel(self, pos):
         relX =  self.player.getPos().get_p()[0] - pos.get_p()[0]
         relY = self.player.getPos().get_p()[1] - pos.get_p()[1]
-        return Vector(relX, relY).normalize().multiply(6)
+        return Vector(relX, relY).normalize().multiply(6), math.atan2(relY, relX)
