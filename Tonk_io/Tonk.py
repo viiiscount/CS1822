@@ -21,6 +21,7 @@ game = Game(kbd, mouse, WIDTH, HEIGHT)
 # Draw handler
 def draw(canvas): 
     if (game.lives == 0):
+        timer.stop()
         canvas.draw_image(IMG, (128, 72), (256, 144), (WIDTH/2-20, HEIGHT/2), (1024, 576))
         if(mouse.getPos() != None):
             game.reset()
