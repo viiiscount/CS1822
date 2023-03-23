@@ -3,8 +3,6 @@ try:
 except ImportError :
     import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
-from .Vector import Vector
-
 # Constants are written in capital letters
 IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/enemy.png')
 

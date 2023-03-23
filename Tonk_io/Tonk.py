@@ -28,9 +28,7 @@ def draw(canvas):
     else:
         timer.start()
         game.gameLoop(canvas)
-
-
-
+        
 # SimpleGUI stuff
 frame = simplegui.create_frame('Tonk.io', WIDTH, HEIGHT, 0)
 timer = simplegui.create_timer(2000, game.timer_handler)

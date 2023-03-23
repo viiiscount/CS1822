@@ -10,6 +10,8 @@ from Physics_Files.Player import Player
 from Physics_Files.Enemy import Enemy
 from Physics_Files.Rocket import Rocket
 from Physics_Files.Interaction import Interaction
+from Physics_Files.Spritesheet import Spritesheet
+from Physics_Files.Spritesheet import Clock
 
 # Constants are written in capital letters
 IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/score.png')
@@ -29,15 +31,18 @@ class Game:
         self.interaction = Interaction()
         self.rocketList = []
         self.enemyList = []
+        self.explosionList = []
         self.score = 0
         self.lives = 0
+        self.timer = Clock()
         
     # Runs the game loop
     def gameLoop(self, canvas):
         self.updateEnemies(canvas)
         self.updateRockets(canvas)
         self.updatePlayer(canvas)
-        self.rocketList, self.enemyList, self.score = self.interaction.rocketCollision(self.rocketList, self.enemyList, self.score)
+        self.drawExplosions(canvas)
+        self.rocketList, self.enemyList, self.explosionList, self.score = self.interaction.rocketCollision(self.rocketList, self.enemyList, self.explosionList, self.score)
         self.enemyList, self.player, self.lives = self.interaction.playerCollision(self.enemyList, self.player, self.lives)
         canvas.draw_image(IMG, (64, 64), (128, 128), (40,40), (64, 64))
         canvas.draw_image(IMG2, (64, 64), (128, 128), (40,110), (64, 64))
@@ -128,3 +133,18 @@ class Game:
         relX =  self.player.getPos().get_p()[0] - pos.get_p()[0]
         relY = self.player.getPos().get_p()[1] - pos.get_p()[1]
         return Vector(relX, relY).normalize().multiply(6), math.atan2(relY, relX)
+        
+    def drawExplosions(self, canvas):
+        doNotRemove = []
+                
+        self.timer.tick()
+        for item in self.explosionList: 
+            item.draw(canvas)
+            if(self.timer.transition(2) == True and item.done() == False):
+                item.next_frame()
+                
+            if(item.done() == False):
+                doNotRemove.append(item)
+        
+        self.explosionList = doNotRemove
+                
