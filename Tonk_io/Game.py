@@ -9,14 +9,14 @@ from Physics_Files.Vector import Vector
 from Physics_Files.Player import Player
 from Physics_Files.Enemy import Enemy
 from Physics_Files.Rocket import Rocket
+from Physics_Files.Ammo import Ammo
 from Physics_Files.Interaction import Interaction
-from Physics_Files.Spritesheet import Spritesheet
 from Physics_Files.Spritesheet import Clock
 
 # Constants are written in capital letters
 IMG = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/score.png')
 IMG2 = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/health.png')
-
+IMG3 = simplegui.load_image('https://raw.githubusercontent.com/viiiscount/CS1822/main/Textures/ammo.png')
 
 # The Game Wrapper class
 class Game:
@@ -25,40 +25,51 @@ class Game:
     def __init__(self, kbd, mouse, width, height):
         self.kbd = kbd
         self.mouse = mouse
+        
         self.width = width
         self.height = height
+        
         self.player = Player(width, height)
         self.interaction = Interaction()
+        self.timer = Clock()
+        
         self.rocketList = []
         self.enemyList = []
         self.explosionList = []
+        self.ammoList = []
+        
         self.score = 0
         self.lives = 0
-        self.timer = Clock()
+        self.ammo = 0
         
     # Runs the game loop
     def gameLoop(self, canvas):
+        self.updateAmmo(canvas)
         self.updateEnemies(canvas)
         self.updateRockets(canvas)
         self.updatePlayer(canvas)
-        self.drawExplosions(canvas)
-        self.rocketList, self.enemyList, self.explosionList, self.score = self.interaction.rocketCollision(self.rocketList, self.enemyList, self.explosionList, self.score)
+        self.updateExplosions(canvas)
+        self.rocketList, self.enemyList, self.explosionList, self.score, self.ammo = self.interaction.rocketCollision(self.rocketList, self.enemyList, self.explosionList, self.score, self.ammo)
+        self.ammoList, self.player, self.ammo = self.interaction.ammoCollision(self.ammoList, self.player, self.ammo)
         self.enemyList, self.player, self.lives = self.interaction.playerCollision(self.enemyList, self.player, self.lives)
         canvas.draw_image(IMG, (64, 64), (128, 128), (40,40), (64, 64))
         canvas.draw_image(IMG2, (64, 64), (128, 128), (40,110), (64, 64))
+        canvas.draw_image(IMG3, (64, 64), (128, 128), (40,180), (64, 64))
         canvas.draw_text(str(self.score), (85, 50), 40, 'Black', 'sans-serif')
         canvas.draw_text(str(self.lives), (85, 120), 40, 'Black', 'sans-serif')
-
+        canvas.draw_text(str(self.ammo), (85, 190), 40, 'Black', 'sans-serif')
     
     # Resets the game   
     def reset(self):
         self.player = Player(self.width, self.height)
         self.rocketList = []
         self.enemyList = []
+        self.explosionList = []
+        self.ammoList = []
         self.score = 0
         self.lives = 3
-        self.fireRate = 2000
-        
+        self.ammo = 25
+
     # Updates player position
     def updatePlayer(self, canvas):
         if(self.kbd.up and self.player.getPos().get_p()[1]-52 > 0):
@@ -82,9 +93,11 @@ class Game:
             relX = mousePos[0] - self.player.getPos().get_p()[0]
             relY = mousePos[1] - self.player.getPos().get_p()[1]
             self.player.img_rot = math.atan2(relY, relX)
-            rocketPos = self.player.getPos().copy().add(Vector(relX, relY).normalize().multiply(40))
-            rocketVel = Vector(relX, relY).normalize().multiply(10).add(self.player.getVel().copy())
-            self.rocketList.append(Rocket(rocketPos, rocketVel))
+            if(self.ammo != 0):
+                rocketPos = self.player.getPos().copy().add(Vector(relX, relY).normalize().multiply(40))
+                rocketVel = Vector(relX, relY).normalize().multiply(10).add(self.player.getVel().copy())
+                self.rocketList.append(Rocket(rocketPos, rocketVel))
+                self.ammo = self.ammo - 1
 
         for rocket in self.rocketList:
             rocket.drawRocket(canvas)
@@ -98,6 +111,26 @@ class Game:
                
         self.enemyList = self.inBounds(self.enemyList)
     
+    # Draws ammo
+    def updateAmmo(self, canvas):
+        for item in self.ammoList:
+            item.draw(canvas)
+        
+    # Draws explosions 
+    def updateExplosions(self, canvas):
+        doNotRemove = []
+                
+        self.timer.tick()
+        for item in self.explosionList: 
+            item.draw(canvas)
+            if(self.timer.transition(2) == True and item.done() == False):
+                item.next_frame()
+                
+            if(item.done() == False):
+                doNotRemove.append(item)
+        
+        self.explosionList = doNotRemove 
+    
     # Checks if item is in the arena
     def inBounds(self, removeList):
         doNotRemove = []
@@ -108,15 +141,21 @@ class Game:
         
         return doNotRemove
         
+    def powerupTimer(self):
+        rand = random.randrange(1, 5)
+        if(rand == 5):
+            ammo = Ammo((Vector(random.randrange(100, 1250), random.randrange(30, 690))))
+            self.ammoList.append(ammo)
+
     # Creates enemies
-    def timer_handler(self):
-        enemyPos = self.randPos()
+    def enemyTimer(self):
+        enemyPos = self.randEnemyPos()
         enemyVel, enemyRot = self.vel(enemyPos)
         enemy = Enemy(enemyPos, enemyVel, enemyRot)
         self.enemyList.append(enemy)
     
     # Gets a random position for the enemy to spawn
-    def randPos(self):
+    def randEnemyPos(self):
         axis = random.randrange(1, 4)
         
         if(axis == 1):
@@ -132,19 +171,4 @@ class Game:
     def vel(self, pos):
         relX =  self.player.getPos().get_p()[0] - pos.get_p()[0]
         relY = self.player.getPos().get_p()[1] - pos.get_p()[1]
-        return Vector(relX, relY).normalize().multiply(6), math.atan2(relY, relX)
-        
-    def drawExplosions(self, canvas):
-        doNotRemove = []
-                
-        self.timer.tick()
-        for item in self.explosionList: 
-            item.draw(canvas)
-            if(self.timer.transition(2) == True and item.done() == False):
-                item.next_frame()
-                
-            if(item.done() == False):
-                doNotRemove.append(item)
-        
-        self.explosionList = doNotRemove
-                
+        return Vector(relX, relY).normalize().multiply(6), math.atan2(relY, relX)                

@@ -21,17 +21,20 @@ game = Game(kbd, mouse, WIDTH, HEIGHT)
 # Draw handler
 def draw(canvas): 
     if (game.lives == 0):
-        timer.stop()
+        enemyTimer.stop()
+        powerupTimer.stop()
         canvas.draw_image(IMG, (128, 72), (256, 144), (WIDTH/2-20, HEIGHT/2), (1024, 576))
         if(mouse.getPos() != None):
             game.reset()
     else:
-        timer.start()
+        enemyTimer.start()
+        powerupTimer.start()
         game.gameLoop(canvas)
         
 # SimpleGUI stuff
 frame = simplegui.create_frame('Tonk.io', WIDTH, HEIGHT, 0)
-timer = simplegui.create_timer(2000, game.timer_handler)
+enemyTimer = simplegui.create_timer(2000, game.enemyTimer)
+powerupTimer = simplegui.create_timer(5000, game.powerupTimer)
 frame.set_canvas_background('Silver')
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(kbd.keyDown)
